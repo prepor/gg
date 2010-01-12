@@ -3,14 +3,16 @@ require "rufus-tokyo"
 require 'pathname'
 require 'active_support'
 
+PUBLIC_PATH = Pathname.new('/home/gg/shared/public')
+
 ROOT_PATH = Pathname.new(File.dirname(__FILE__))
 DB = Rufus::Tokyo::Cabinet.new('data/db.tch')
 
-def make_deb(name, version)
+def make_deb(orig_name, name, version)
   package_name = "#{name}-#{version}"
-  path = ROOT_PATH + 'public/pool' + (package_name)
-  deb_path = path + 'debian'
-  deb_path.mkpath unless path.exist?
+  path = PUBLIC_PATH + 'public/pool' + (package_name)
+  deb_path = path + 'DEBIAN'
+  deb_path.mkpath unless deb_path.exist?
   control = <<EOF
 Package: gem-#{name}
 Version: #{version}
@@ -31,7 +33,7 @@ EOF
 #!/bin/sh
 
 echo "Gem installing"
-gem install #{name} -v #{version}
+gem install #{orig_name} -v #{version}
 
 EOF
     f.puts str
@@ -42,7 +44,7 @@ EOF
 #!/bin/sh
 
 echo "Gem uninstalling"
-gem uninstall #{name} -v #{version}
+gem uninstall #{orig_name} -v #{version}
 
 EOF
     f.puts str
@@ -73,8 +75,8 @@ data.each do |name, version, lang|
   end
 end
 File.open('Packages_new', 'w') do |packages|
-  last_versions.each do |k, (name, version, lang)|
-    name = name.downcase.gsub(/[^\w\d]/, '')
+  last_versions.each do |k, (orig_name, version, lang)|
+    name = orig_name.downcase.gsub(/[^\w\d-]/, '')
     name = name.gsub('_', '-')
     if name.present? && name =~ /^\w/ && name.size > 1
       package_name = "#{name}-#{version}"
@@ -82,7 +84,7 @@ File.open('Packages_new', 'w') do |packages|
         gem_spec = Marshal.load(gem_spec)
       else        
         puts "Generating gem #{package_name}"
-        control, md5, sha1, sha256, size = make_deb(name, version)
+        control, md5, sha1, sha256, size = make_deb(orig_name, name, version)
         gem_spec = { :name => name, :version => version, :lang => lang, :control => control, :md5 => md5, :sha1 => sha1, :sha256 => sha256, :size => size}
         DB[package_name] = Marshal.dump(gem_spec)
       end
@@ -93,4 +95,4 @@ File.open('Packages_new', 'w') do |packages|
   end  
 end
 
-FileUtils.mv 'Packages_new', 'public/Packages', :force => true
+FileUtils.mv 'Packages_new', (PUBLIC_PATH + 'Packages').to_s, :force => true
