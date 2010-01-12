@@ -1,4 +1,6 @@
-pool/*
-db.tch
+public/Packages
+public/pool/*
+data/db.tch
 specs.4.8
-Packages
+Capfile
+config/deploy.rb

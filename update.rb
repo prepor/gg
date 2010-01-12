@@ -4,7 +4,7 @@ require 'pathname'
 require 'active_support'
 
 ROOT_PATH = Pathname.new(File.dirname(__FILE__))
-DB = Rufus::Tokyo::Cabinet.new('db.tch')
+DB = Rufus::Tokyo::Cabinet.new('data/db.tch')
 
 def make_deb(name, version)
   package_name = "#{name}-#{version}"
@@ -61,8 +61,8 @@ EOF
   [control, md5, sha1, sha256, File.size("#{path.to_s}.deb")]
 end
 
-# `wget http://gemcutter.org/specs.4.8.gz`
-# `gzip -dfv specs.4.8.gz`
+`wget http://gemcutter.org/specs.4.8.gz`
+`gzip -dfv specs.4.8.gz`
 
 data = Marshal.load(File.open('specs.4.8', 'r') { |f| f.read })
 
@@ -93,4 +93,4 @@ File.open('Packages_new', 'w') do |packages|
   end  
 end
 
-FileUtils.mv 'Packages_new', 'Packages', :force => true
+FileUtils.mv 'Packages_new', 'public/Packages', :force => true
