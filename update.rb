@@ -4,9 +4,9 @@ require 'pathname'
 require 'active_support'
 
 PUBLIC_PATH = Pathname.new('/home/gg/shared/public')
-
+DB_PATH = Pathname.new('/home/gg/shared/data/db.tch')
 ROOT_PATH = Pathname.new(File.dirname(__FILE__))
-DB = Rufus::Tokyo::Cabinet.new('data/db.tch')
+DB = Rufus::Tokyo::Cabinet.new(DB_PATH.to_s)
 
 def make_deb(orig_name, name, version)
   package_name = "#{name}-#{version}"
