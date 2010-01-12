@@ -4,3 +4,7 @@ data/db.tch
 specs.4.8
 Capfile
 config/deploy.rb
+
+bin/*
+vendor/gems/*
+!vendor/gems/cache/

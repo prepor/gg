@@ -1,4 +1,4 @@
-require 'rubygems'
+require 'vendor/gems/environment.rb'
 require "rufus-tokyo"
 require 'pathname'
 require 'active_support'
@@ -8,7 +8,7 @@ DB = Rufus::Tokyo::Cabinet.new('data/db.tch')
 
 def make_deb(name, version)
   package_name = "#{name}-#{version}"
-  path = ROOT_PATH + 'pool' + (package_name)
+  path = ROOT_PATH + 'public/pool' + (package_name)
   deb_path = path + 'debian'
   deb_path.mkpath unless path.exist?
   control = <<EOF
