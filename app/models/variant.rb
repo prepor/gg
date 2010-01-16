@@ -3,7 +3,7 @@ class Variant
   
   include MongoMapper::EmbeddedDocument
   
-  before_create :add_default_depends
+  # before_create :add_default_depends
   
   key :platform, String
   key :arch, String
@@ -20,7 +20,7 @@ class Variant
   
   many :control_hooks
   
-  one :package
+  # belongs_to :package
   
   def control_file(for_index = false)
     file = ["Package: gem-#{package.name}",
@@ -36,7 +36,7 @@ class Variant
       file << "SHA256: #{sha256}"
       file << "MD5sum: #{md5}"
     end
-    file << "Description: #{package.description}"
+    file << "Description: #{package.description.gsub("\n", ' ')}"
     file * "\n"
   end
   
@@ -51,7 +51,7 @@ class Variant
   
   def make_deb
     deb_path.mkpath unless deb_path.exist?
-    (['control', control_file] + control_hooks.map { |v| [v.name, v.content] }).each do |file_name, content|
+    ([['control', control_file]] + control_hooks.map { |v| [v.name, v.content] }).each do |file_name, content|
       file_path = deb_path + file_name
       file_path.open('w') do |f|
         f.puts content
@@ -60,10 +60,10 @@ class Variant
     end
     `dpkg-deb -z0 -b #{path.to_s}`
     FileUtils.rm_r(path.to_s)
-    md5 = `openssl dgst -md5 #{path.to_s}.deb`.match(/= (.+)/)[1]
-    sha1 = `openssl dgst -sha #{path.to_s}.deb`.match(/= (.+)/)[1]
-    sha256 = `openssl dgst -sha256 #{path.to_s}.deb`.match(/= (.+)/)[1]
-    size = File.size("#{path.to_s}.deb")
+    self.md5 = `openssl dgst -md5 #{path.to_s}.deb`.match(/= (.+)/)[1]
+    self.sha1 = `openssl dgst -sha #{path.to_s}.deb`.match(/= (.+)/)[1]
+    self.sha256 = `openssl dgst -sha256 #{path.to_s}.deb`.match(/= (.+)/)[1]
+    self.size = File.size("#{path.to_s}.deb")
   end
   
   def self.dist_path(platform, arch)
@@ -74,7 +74,7 @@ class Variant
   end
   
   def path
-    @path ||= dist_path(platform, arch) + package_name
+    @path ||= self.class.dist_path(platform, arch) + package.original_name
   end
   
   def deb_path
@@ -100,6 +100,11 @@ class Variant
   
   def add_default_depends
     depends << Depend.new(:name => 'rubygems')
+  end
+  
+  # бредовый монгомэпер
+  def package
+    _root_document
   end
   
 end

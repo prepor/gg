@@ -23,30 +23,33 @@ module GoodGem
       end
 
       last_versions.each do |k, (name, version, lang)|
-        require 'ruby-debug'
-        debugger
-        unless (package = Package.find(:first, :conditions => {:original_name => name, :version => version}))
+        unless (package = Package.find(:first, :conditions => {:original_name => name, :version => Gem::Version.to_mongo(version)}))
           package = Package.create :original_name => name, :version => version
+
           puts "Receive specs for #{package.name}"
           package.receive_spec
         end
-        
-        package.variants.all(:conditions => { :is_generated => false}).each do |variant|
+
+        package.variants.select { |v| v.is_generated == false }.each do |variant|
+
           puts "Generating #{variant.deb_name}"
           variant.generate
         end
       end
       
-      # all_variants.each do |platform, arch|
-      #   dist_path = Variant.dist_path(platform, arch)
-      #   File.join(RAILS_ROOT, 'specs.4.8')
-      #   Package.all(:conditions => { :variant => { :platform => platform, :arch => arch}}).each do |package|
-      #     variant = package.variant.find(:first, :conditions => { :variant => { :platform => platform, :arch => arch}})
-      #     unless variant.is_generated?
-      #       variant.generate
-      #     end
-      #   end
-      # end
+      all_variants.each do |platform, arch|
+        dist_path = Variant.dist_path(platform, arch)        
+        Package.each do |package|
+          variant = package.variants.detect { |v| v.platform == platform && v.arch == arch } || package.variants.detect { |v| v.platform == platform && v.arch == 'all' } || package.variants.detect { |v| v.platform == 'all' && v.arch == arch } || package.variants.detect { |v| v.platform == 'all' && v.arch == 'all' }
+          unless variant.is_generated?
+            variant.generate
+          end
+          (dist_path + 'Packages_new').open('w') do |f|
+            f.puts "#{variant.control_file(true)}\n"
+          end
+                    
+        end
+      end
       
       # File.open(File.join(RAILS_ROOT, specs.4.8), 'w') do |packages|
       #   last_versions.each do |k, (orig_name, version, lang)|
