@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require File.expand_path('../../config/environment',  __FILE__)
+loop do
+  # if GoodGem.time_for_specs?
+    GoodGem.update_specs
+  # end
+  
+  # indexes_for_regenerate = {}
+  # Package.all(:conditions => { 'variants.is_generated' => false}).each do |package|
+  #   package.variants.all(:conditions => { 'is_generated' => false}).each do |variant|
+  #     puts "Generating #{variant.deb_name}"
+  #     variant.generate
+  #     indexes_for_regenerate["#{variant.platform}-#{variant.arch}"] = [variant.platform, variant.arch]
+  #   end
+  # end
+end

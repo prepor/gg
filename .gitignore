@@ -1,4 +1,4 @@
-public/Packages
+public/dists/**/*
 public/pool/*
 data/db.tch
 specs.4.8

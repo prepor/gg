@@ -1,0 +1,82 @@
+
+
+Processing Clearance::UsersController#new (for 127.0.0.1 at 2010-01-14 02:21:32) [GET]
+  Parameters: {"action"=>"new", "controller"=>"clearance/users"}
+
+NoMethodError (undefined method `signed_in?' for #<Clearance::UsersController:0x102037bb0>):
+  
+
+Rendered rescues/_trace (42.6ms)
+Rendered rescues/_request_and_response (1.7ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing Clearance::UsersController#new (for 127.0.0.1 at 2010-01-14 02:23:40) [GET]
+  Parameters: {"action"=>"new", "controller"=>"clearance/users"}
+Rendering users/new
+Rendered users/_form (4.4ms)
+Completed in 129ms (View: 115 | 200 OK [http://localhost/users/new]
+
+
+Processing Clearance::UsersController#create (for 127.0.0.1 at 2010-01-14 02:24:00) [POST]
+  Parameters: {"user"=>{"password_confirmation"=>"[FILTERED]", "password"=>"[FILTERED]", "email"=>"prepor@me.com"}, "commit"=>"Sign up", "action"=>"create", "authenticity_token"=>"klnklP5C3oHl2afvsfwz88kXJCU4TNapHdcA7KmEnlM=", "controller"=>"clearance/users"}
+Sent mail to prepor@me.com
+
+Date: Thu, 14 Jan 2010 02:24:00 +0300
+From: donotreply@example.com
+To: prepor@me.com
+Subject: Account confirmation
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+
+http://localhost/users/4b4e5610e320c53166000001/confirmation/new?token=39fc5895dd3b8ac4aecbbec633072bde9bc4f328
+Redirected to http://localhost:3000/session/new
+Completed in 90ms | 302 Found [http://localhost/users]
+
+
+Processing Clearance::SessionsController#new (for 127.0.0.1 at 2010-01-14 02:24:00) [GET]
+  Parameters: {"action"=>"new", "controller"=>"clearance/sessions"}
+Rendering sessions/new
+Completed in 12ms (View: 11 | 200 OK [http://localhost/session/new]
+
+
+Processing Clearance::ConfirmationsController#new (for 127.0.0.1 at 2010-01-14 02:24:18) [GET]
+  Parameters: {"token"=>"[FILTERED]", "action"=>"new", "controller"=>"clearance/confirmations", "user_id"=>"4b4e5610e320c53166000001"}
+DEPRECATION WARNING: save with true/false is deprecated. You should now use :validate => true/false.. (called from save at /opt/local/lib/ruby/gems/1.8/gems/mongo_mapper-0.6.10/lib/mongo_mapper/document.rb:380)
+DEPRECATION WARNING: save with true/false is deprecated. You should now use :validate => true/false.. (called from save at /opt/local/lib/ruby/gems/1.8/gems/mongo_mapper-0.6.10/lib/mongo_mapper/document.rb:380)
+Redirected to http://localhost:3000/
+Completed in 230ms | 302 Found [http://localhost/users/4b4e5610e320c53166000001/confirmation/new?token=39fc5895dd3b8ac4aecbbec633072bde9bc4f328]
+
+
+Processing Clearance::UsersController#show (for 127.0.0.1 at 2010-01-14 02:24:31) [GET]
+  Parameters: {"action"=>"show", "id"=>"edit", "controller"=>"clearance/users"}
+
+ActionController::UnknownAction (No action responded to show. Actions: create and new):
+  
+
+Rendering rescues/layout (not_found)
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-01-14 02:25:17) [GET]
+
+ActionController::RoutingError (No route matches "/users/4b4e5610e320c53166000001/show" with {:method=>:get}):
+  
+
+Rendering rescues/layout (not_found)
+
+
+Processing Clearance::UsersController#edit (for 127.0.0.1 at 2010-01-14 02:25:20) [GET]
+  Parameters: {"action"=>"edit", "id"=>"4b4e5610e320c53166000001", "controller"=>"clearance/users"}
+
+ActionController::UnknownAction (No action responded to edit. Actions: create and new):
+  
+
+Rendering rescues/layout (not_found)
+
+
+Processing Clearance::UsersController#new (for 127.0.0.1 at 2010-01-14 02:25:47) [GET]
+  Parameters: {"action"=>"new", "controller"=>"clearance/users"}
+Redirected to http://localhost:3000/
+Filter chain halted as [:redirect_to_root] rendered_or_redirected.
+Completed in 8ms | 302 Found [http://localhost/users/new]
