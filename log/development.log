@@ -80,3 +80,16 @@ Processing Clearance::UsersController#new (for 127.0.0.1 at 2010-01-14 02:25:47)
 Redirected to http://localhost:3000/
 Filter chain halted as [:redirect_to_root] rendered_or_redirected.
 Completed in 8ms | 302 Found [http://localhost/users/new]
+
+
+Processing AttestationsController#fill (for 127.0.0.1 at 2010-01-17 01:21:05) [GET]
+  Parameters: {"id"=>"2"}
+Completed in 3ms (View: 1 | 200 OK [http://localhost/attestations/2/fill]
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-01-17 01:25:31) [GET]
+
+ActionController::RoutingError (No route matches "/attestations/2/fill" with {:method=>:get}):
+  
+
+Rendering rescues/layout (not_found)

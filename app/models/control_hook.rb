@@ -4,5 +4,7 @@ class ControlHook
   key :name, String
   key :content, String
   key :last_edit_at, Time
+  key :is_default, Boolean, :default => true
+  
   belongs_to :last_edit_by, :class => User
 end
