@@ -12,7 +12,7 @@ module GoodGem
       
       `gzip -dfv -c #{gz_path} > #{plain_path}`
 
-      data = Marshal.load(File.open(plain_path, 'r') { |f| f.read })
+      data = Marshal.load(File.open(plain_path, 'r') { |f| f.read })[0..100]
 
       packages = []
       last_versions = {}
@@ -31,24 +31,25 @@ module GoodGem
         end
 
         package.variants.select { |v| v.is_generated == false }.each do |variant|
-
           puts "Generating #{variant.deb_name}"
           variant.generate
         end
       end
       
       all_variants.each do |platform, arch|
-        dist_path = Variant.dist_path(platform, arch)        
-        Package.each do |package|
-          variant = package.variants.detect { |v| v.platform == platform && v.arch == arch } || package.variants.detect { |v| v.platform == platform && v.arch == 'all' } || package.variants.detect { |v| v.platform == 'all' && v.arch == arch } || package.variants.detect { |v| v.platform == 'all' && v.arch == 'all' }
-          unless variant.is_generated?
-            variant.generate
+        puts "Generating packages for platform #{platform} and arch #{arch}"
+        dist_path = Variant.dist_path(platform, arch)
+        dist_path.mkpath
+        (dist_path + 'Packages_new').open('w') do |f|     
+          Package.all.each do |package|
+            variant = package.variant_for(platform, arch)
+            unless variant.is_generated?
+              variant.generate
+            end                      
+            f.puts "#{variant.control_file(true)}\n\n"
           end
-          (dist_path + 'Packages_new').open('w') do |f|
-            f.puts "#{variant.control_file(true)}\n"
-          end
-                    
         end
+        FileUtils.mv((dist_path + 'Packages_new').to_s, (dist_path + 'Packages').to_s, :force => true)
       end
       
       # File.open(File.join(RAILS_ROOT, specs.4.8), 'w') do |packages|
@@ -85,7 +86,7 @@ module GoodGem
     def all_variants
       variants = [['all', 'all']]
       config[:platforms].each do |platform|
-        config[:archs].each do |arch|
+        (['all'] + config[:archs]).each do |arch|
           variants << [platform, arch]
         end
       end

@@ -2,14 +2,14 @@ require 'open-uri'
 
 class Package
   include MongoMapper::Document
-  after_create :add_main_maintainer, :add_first_variant, :set_created_at, :set_name
+  after_create :set_defaults
   
   key :name, String
   key :original_name, String
   key :created_at, Time
   
   key :version, Gem::Version  
-  key :is_generated, Boolean
+  # key :is_generated, Boolean
   
   key :description, String
   key :authors, String
@@ -17,9 +17,12 @@ class Package
   key :project_uri, String
   key :gem_uri, String
   
+  key :maintainer_ids, Array
+  
   many :variants
   
-  many :maintainers, :class => User
+  
+  many :maintainers, :class => User, :in => :maintainer_ids
     
   def maintainers_list
     maintainers.map { |v| "#{v.name} <#{v.email}>"} * ', '
@@ -48,6 +51,10 @@ class Package
                       ] * "\n"
   end
   
+  def variant_for(platform, arch)
+    variants.detect { |v| v.platform == platform && v.arch == arch } || variants.detect { |v| v.platform == platform && v.arch == 'all' } || variants.detect { |v| v.platform == 'all' && v.arch == arch } || variants.detect { |v| v.platform == 'all' && v.arch == 'all' }
+  end
+  
   def receive_spec
     desc = ActiveSupport::JSON.decode(open(GoodGem.config[:gems_api_url] + "#{original_name}.json").read)
     last_version = Gem::Version.new(desc['version'])
@@ -65,7 +72,15 @@ class Package
   end
   
   def set_created_at
-    created_at = Time.zone.now    
+    self.created_at = Time.zone.now    
+  end
+  
+  def set_defaults
+    add_main_maintainer
+    add_first_variant
+    set_created_at
+    set_name
+    save
   end
   
   def set_name

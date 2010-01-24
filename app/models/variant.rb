@@ -30,8 +30,9 @@ class Variant
     "Maintainer: #{package.maintainers_list}",
     "Priority: extra",
     "Section: gems",
-    "Filename: #{deb_name}"]
+    "Filename: #{pool_deb_path}"]
     if for_index
+      file << "Size: #{size}"
       file << "SHA1: #{sha1}"
       file << "SHA256: #{sha256}"
       file << "MD5sum: #{md5}"
@@ -73,8 +74,19 @@ class Variant
     path
   end
   
-  def path
-    @path ||= self.class.dist_path(platform, arch) + package.original_name
+  def pool_path(platform, arch)
+    path = GoodGem.config[:pool_path]
+    path += platform unless platform == 'all'
+    path += arch unless arch == 'all'
+    path
+  end
+  
+  def path(for_deb = false)
+    @path ||= self.pool_path(platform, arch) + (package.name + '-' + package.version.to_s + (for_deb ? '.deb' : ''))
+  end
+  
+  def pool_deb_path
+    path(true).relative_path_from(GoodGem.config[:pool_path] + '..')
   end
   
   def deb_path
@@ -91,6 +103,8 @@ class Variant
   
   def generate    
     make_deb
+    self.is_generated = true
+    save
   end
   
   
