@@ -1,0 +1,14 @@
+<h2><%= @package.name %> <%= resource.state != 'approved' ? "(#{resource.state})" : '' %> | <%= link_to 'deb info', package_path(@package) %></h2>
+<div><%= render :partial => 'variants/suggest_add', :locals => { :package => @package} %></div>
+<div>platform <strong><%= resource.platform %></strong>, arch <strong><%= resource.arch %></strong></div>
+<strong>Depends:</strong> <%= resource.depends.map { |v| v.for_list } * ', ' %><br/>
+
+
+Scripts:
+
+<% resource.control_hooks.each do |control_hook| %>
+<div>
+  <strong><%= control_hook.name %></strong>
+  <div><pre><code><%= control_hook.content %></code></pre></div>
+</div>
+<% end %>

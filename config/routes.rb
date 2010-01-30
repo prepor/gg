@@ -1,6 +1,13 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :users
   
-  map.resources :attestations, :member => { :fill => 'get' }
+  Clearance::Routes.draw(map)
+  
+  map.resources :packages do |package|
+    package.resources :variants do |variant|
+      variant.resources :control_hooks
+    end
+  end
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
@@ -43,5 +50,5 @@ ActionController::Routing::Routes.draw do |map|
   # map.connect ':controller/:action/:id'
   # map.connect ':controller/:action/:id.:format'
   
-  map.root :controller => 'home'
+  map.root :controller => 'root'
 end

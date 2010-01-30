@@ -5,12 +5,14 @@ module GoodGem
       @@config ||= {}
     end
     
+    require 'config/system'
+    
     def update_specs
       gz_path = File.join(RAILS_ROOT, 'specs.4.8.gz')
       plain_path = File.join(RAILS_ROOT, 'specs.4.8')
-      `wget #{GoodGem.config[:specs_url]} -O #{gz_path}`
+      # `wget #{GoodGem.config[:specs_url]} -O #{gz_path}`
       
-      `gzip -dfv -c #{gz_path} > #{plain_path}`
+      # `gzip -dfv -c #{gz_path} > #{plain_path}`
 
       data = Marshal.load(File.open(plain_path, 'r') { |f| f.read })[0..100]
 
@@ -23,7 +25,7 @@ module GoodGem
       end
 
       last_versions.each do |k, (name, version, lang)|
-        unless (package = Package.find(:first, :conditions => {:original_name => name, :version => Gem::Version.to_mongo(version)}))
+        unless (package = Package.find(:first, :conditions => {:original_name => name, :version => version}))
           package = Package.create :original_name => name, :version => version
 
           puts "Receive specs for #{package.name}"
@@ -78,10 +80,10 @@ module GoodGem
       
     end
     
-    def time_for_specs?
-      val = Misc.find_by_key('last_spec_update')
-      !val && val[:time] < 1.hour.ago
-    end
+    # def time_for_specs?
+    #   val = Misc.find_by_key('last_spec_update')
+    #   !val && val[:time] < 1.hour.ago
+    # end
     
     def all_variants
       variants = [['all', 'all']]

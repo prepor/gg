@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>GoodGem</title>
+    <%= stylesheet_link_tag 'reset', 'text', 'grid', 'layout', 'nav', 'formtastic', 'formtastic_changes' %>
+    <%= javascript_include_tag 'mootools-core', 'application' %>
+  </head>
+  <body>
+    <div class="container_12"> 
+			<div id="header" class="grid_6"> 
+				<h1 id="branding"> 
+					<a href="/">GoodGem</a>					
+				</h1> 
+			  <h3 id="slogan">The way to gems on your computer</h3>
+			</div>
+			<div class="grid_6"> 
+			  <%= link_to 'Browse debs', packages_path, :class => 'main_link' %> | 
+			  <a class="main_link" href=".">Help</a> |
+			  <% if signed_in? %>
+			    <%= link_to 'Profile', user_path(current_user), :class => 'main_link' %> | 
+  			  <%= link_to 'Logout', session_path, :class => 'main_link', :method => :delete %>
+			  <% else %>
+			    <%= link_to 'Registration for maintainers', new_user_path, :class => 'main_link' %> | 
+			    <%= link_to 'Login', new_session_path, :class => 'main_link' %>
+			  <% end %>
+			  <br/><br/><br/><br/><br/>
+			</div>
+			
+			
+			<div id="flash">
+        <% flash.each do |key, value| -%>
+        <div class="grid_6 prefix_3 suffix_3"> 
+          <div class="flash_message flash_<%= key %>" ><%=h value %></div>
+        </div>
+        <% end -%>
+      </div>

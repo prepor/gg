@@ -11,11 +11,11 @@
 #  updated_at   :datetime
 #
 
-class Depend < ActiveRecord::Base
-  CompareTypes = ['<<', '<=', '=', '>=', '>>']
-  
-  def for_list
-    name + (version.present? ? " (#{compare_type} #{version})" : '')
+require 'test_helper'
+
+class DependTest < ActiveSupport::TestCase
+  # Replace this with your real tests.
+  test "the truth" do
+    assert true
   end
-  
 end

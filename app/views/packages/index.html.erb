@@ -1,0 +1,8 @@
+<ul class="packages list">
+<% collection.each do |item| %>
+  <li class="item"><span class="name"><%= link_to item.name, package_path(item) %></span> (<span class="version"><%= item.version %></span>)
+    <div class="description"><%= item.description %></div>
+  </li>
+<% end %>
+</ul>
+<%= will_paginate collection %>

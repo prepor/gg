@@ -1,0 +1,29 @@
+<h2>Add new variant for package <%= @package.name %></h2>
+<% semantic_form_for [@package, resource] do |form| %>
+  <% form.inputs do %>
+    <%= form.input :platform, :as => :select, :collection => ['all'] + GoodGem.config[:platforms], :include_blank => false %>
+    <%= form.input :arch, :as => :select, :collection => ['all'] + GoodGem.config[:archs], :include_blank => false %>
+  <% end %>
+  <strong>Depends</strong> (<%= link_to 'add', '#', :class => 'add_field_set' %>)<br/>
+  <% form.fields_for :depends, :child_index => '' do |depend| %>
+    <% form.inputs do %>
+      <%= depend.text_field :name %> 
+      <%= depend.select :compare_type, Depend::CompareTypes, { :include_blank => true } %> 
+      <%= depend.text_field :version %> 
+      <%= link_to 'Remove', '#', :class => 'remove_element hidden' %>
+    <% end %>
+  <% end %>
+  
+  <strong>Scripts:</strong><br/>
+  <% form.fields_for :control_hooks do |control_hook| %>
+        <%= control_hook.input :name, :as => :hidden %> 
+    <% form.inputs do %>
+      <%= control_hook.object.name %> <br/>
+
+      <%= control_hook.text_area :content %> 
+    <% end %>
+  <% end %>
+  <% form.buttons do %>
+    <%= form.commit_button %>
+  <% end %>
+<% end %>

@@ -1,0 +1,29 @@
+<div class="package">
+<h2><%= resource.name %> (<%= resource.version %>)</h2>
+<div class="description"><%= resource.description %></div>
+<div class="install_block">
+  <div class="code">
+    aptitude install <%= resource.name %>
+  </div>
+</div>
+
+<p>
+  <strong>Maintainers:</strong> <%= resource.maintainers.map { |v| link_to v.name, "mailto:#{v.email}"} * ', ' %>
+</p>
+<p>
+  <strong>Original:</strong> <%= link_to resource.original_name, "http://gemcutter.org/gems/#{resource.original_name}" %>
+</p>
+
+<p>
+  <strong>Variants</strong>
+  <ul>
+    <% resource.variants.approved.each do |variant| %>
+      <li><%= link_to "Platform: #{variant.platform}, arch: #{variant.arch}", package_variant_path(resource, variant) %><br/>
+      Depends: <%= variant.depends.map { |v| v.for_list } * ', ' %><br/>
+      Scripts: <%= variant.control_hooks.map { |v| v.name } * ', ' %></li>
+    <% end %>
+  </ul>
+<%= render :partial => 'variants/suggest_add', :locals => { :package => resource} %>
+</p>
+  
+</div>

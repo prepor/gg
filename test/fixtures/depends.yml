@@ -11,11 +11,10 @@
 #  updated_at   :datetime
 #
 
-class Depend < ActiveRecord::Base
-  CompareTypes = ['<<', '<=', '=', '>=', '>>']
-  
-  def for_list
-    name + (version.present? ? " (#{compare_type} #{version})" : '')
-  end
-  
-end
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+# one:
+#   column: value
+#
+# two:
+#   column: value

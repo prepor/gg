@@ -1,58 +1,62 @@
+# == Schema Information
+#
+# Table name: packages
+#
+#  id            :integer         not null, primary key
+#  name          :string(255)
+#  original_name :string(255)
+#  version       :string(255)
+#  description   :text
+#  authors       :string(255)
+#  project_uri   :string(255)
+#  gem_uri       :string(255)
+#  created_at    :datetime
+#  updated_at    :datetime
+#
+
 require 'open-uri'
 
-class Package
-  include MongoMapper::Document
+class Package < ActiveRecord::Base
   after_create :set_defaults
   
-  key :name, String
-  key :original_name, String
-  key :created_at, Time
+  has_many :users_packages
+  has_many :maintainers, :class_name => 'User', :through => :users_packages, :source => :user
   
-  key :version, Gem::Version  
-  # key :is_generated, Boolean
-  
-  key :description, String
-  key :authors, String
-  
-  key :project_uri, String
-  key :gem_uri, String
-  
-  key :maintainer_ids, Array
-  
-  many :variants
-  
-  
-  many :maintainers, :class => User, :in => :maintainer_ids
+  has_many :variants
     
   def maintainers_list
     maintainers.map { |v| "#{v.name} <#{v.email}>"} * ', '
   end
   
   def add_main_maintainer
-    maintainers << User.find_by_email(GoodGem.config[:main_maintainer][:email])
+    self.maintainers << User.find_by_email(GoodGem.config[:main_maintainer][:email])
   end
   
   def add_first_variant
-    variant = Variant.new( :platform => 'all',
-                            :arch => 'all')
+    variant = variants.create(  :platform => 'all',
+                                :arch => 'all',
+                                :created_by => maintainers.first)
                        
 
     variant.add_default_depends
-
-    variants << variant
-    save
-    variant.postinst = ["#!/bin/sh",
-                        "echo \"Gem installing\"",
-                        "gem install #{original_name} -v #{version.to_s}}"
-                        ] * "\n"
-    variant.postrm = ["#!/bin/sh",
-                      "echo \"Gem uninstalling\"",
-                      "gem uninstall #{original_name} -v #{version.to_s}}"
-                      ] * "\n"
+    variant.add_default_hooks
   end
   
   def variant_for(platform, arch)
-    variants.detect { |v| v.platform == platform && v.arch == arch } || variants.detect { |v| v.platform == platform && v.arch == 'all' } || variants.detect { |v| v.platform == 'all' && v.arch == arch } || variants.detect { |v| v.platform == 'all' && v.arch == 'all' }
+    variants = variants.approved
+    [[platform, arch], [platform, 'all'], ['all', arch], ['all', 'all']].each do |p, a|
+      if (variant = variants.detect { |v| v.platform == p && v.arch == a })
+        return variant
+      end
+    end
+  end
+  
+  def version
+    Gem::Version.new(super)
+  end
+  
+  def version=(val)
+    super(val.to_s)
   end
   
   def receive_spec

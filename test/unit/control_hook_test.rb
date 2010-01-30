@@ -13,6 +13,11 @@
 #  updated_at      :datetime
 #
 
-class ControlHook < ActiveRecord::Base
-  belongs_to :last_edit_by, :class_name => User
+require 'test_helper'
+
+class ControlHookTest < ActiveSupport::TestCase
+  # Replace this with your real tests.
+  test "the truth" do
+    assert true
+  end
 end

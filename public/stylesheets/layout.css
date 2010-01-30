@@ -11,6 +11,29 @@ body {
 	padding: 0 0 40px;
 }
 
+.flash_message {
+	border-style:solid;
+	border-width:2px;
+	margin:4px;
+	padding:4px;
+	font-size:1.5em;
+}
+
+.flash_success {
+	background-color: #5BD475;
+	border-color: #367D45;
+}
+
+.flash_notice {
+	background-color: #C2CFC5;
+	border-color: #6E7570;
+}
+
+.flash_failure {
+	background-color: #E5837F;
+	border-color: #9C1F22;
+}
+
 .main_link {
 	color: #3e55ff;
 	font-size:1.5em;
@@ -65,8 +88,40 @@ body {
 	font-size:1em;
 }
 
+.packages.list {
+	background-color: white;
+}
+
+.packages .item:hover {
+	background-color: #eee	;
+}
+
+.packages .item .name {
+	font-weight: bold;
+}
+
+.packages .item .name a {
+	color: black;
+}
+
+.packages .item .description {
+	color: #8f8f8f;
+}
+
+.package .description {
+	color: #8f8f8f;
+}
+
+#content{
+
+}
+
 #footer {
 	text-align: right;
+}
+
+.hidden {
+	display: none;
 }
 
 /* anchors

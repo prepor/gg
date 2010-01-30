@@ -1,26 +1,47 @@
-class Variant
+# == Schema Information
+#
+# Table name: variants
+#
+#  id           :integer         not null, primary key
+#  platform     :string(255)
+#  arch         :string(255)
+#  lang         :string(255)
+#  sha256       :string(255)
+#  sha1         :string(255)
+#  md5          :string(255)
+#  size         :string(255)
+#  is_generated :boolean
+#  package_id   :integer
+#  created_at   :datetime
+#  updated_at   :datetime
+#
+
+
+class Variant < ActiveRecord::Base
   ControlHooks = ['postinst', 'postrm', 'preinst', 'prerm']
-  
-  include MongoMapper::EmbeddedDocument
   
   # before_create :add_default_depends
   
-  key :platform, String
-  key :arch, String
+  named_scope :approved, :conditions => { :state => 'approved' }
   
-  key :lang, String
-  key :sha256, String
-  key :sha1, String
-  key :md5, String
-  key :size, Integer
+  belongs_to :created_by, :class_name => 'User'
+  belongs_to :package
   
-  key :is_generated, Boolean, :default => false
+  has_many :depends
   
-  many :depends
+  has_many :control_hooks
   
-  many :control_hooks
+  has_many :users_packages, :foreign_key => :package_id, :primary_key => :package_id
+  has_many :maintainers, :class_name => 'User', :through => :users_packages, :source => :user
   
-  # belongs_to :package
+  accepts_nested_attributes_for :depends
+  accepts_nested_attributes_for :control_hooks
+  
+  def self.suggested_by_user(user)
+    self.with_exclusive_scope do
+      all :conditions => { :state => 'suggested', :'users_packages.user_id' => user.id }, :joins => :users_packages
+    end
+  end
   
   def control_file(for_index = false)
     file = ["Package: gem-#{package.name}",
@@ -105,8 +126,7 @@ class Variant
     make_deb
     self.is_generated = true
     save
-  end
-  
+  end  
   
   def after_create
     # GoodGem.update_index(self)
@@ -116,9 +136,63 @@ class Variant
     depends << Depend.new(:name => 'rubygems')
   end
   
-  # бредовый монгомэпер
-  def package
-    _root_document
+  def add_default_hooks
+    self.preinst = ["#!/bin/sh",
+                        "echo \"Gem installing\"",
+                        "gem install #{package.original_name} -v #{package.version.to_s}"
+                        ] * "\n"
+    self.prerm = ["#!/bin/sh",
+                      "echo \"Gem uninstalling\"",
+                      "gem uninstall #{package.original_name} -v #{package.version.to_s}"
+                      ] * "\n"
   end
+  
+  def set_hooks_for_new
+    add_default_hooks
+    (ControlHooks - ['preinst', 'prerm']).each do |hook|
+      control_hooks.build :name => hook, :content => ''
+    end
+  end
+  
+  def move_old_variant_to_archive
+    package.variants.approved.all(:conditions => { :platform => platform, :arch => arch }).each do |variant|
+      variant.update_attributes :state => 'archived'
+    end
+  end
+  
+  def send_notifications_about_suggest
+    
+  end
+  
+  def send_notification_about_approve
+    
+  end
+  
+  def send_notification_about_decline
+    
+  end
+  
+  def approve!
+    self.state = 'approved'
+    send_notification_about_approve
+    save
+  end
+  
+  def decline!
+    self.state = 'declined'
+    send_notification_about_decline
+    save
+  end
+  
+  def before_create
+    if package.maintainers.include?(created_by)
+      self.state = 'approved'
+      move_old_variant_to_archive
+    else
+      self.state = 'suggested'
+      send_notifications_about_suggest
+    end
+  end
+  
   
 end

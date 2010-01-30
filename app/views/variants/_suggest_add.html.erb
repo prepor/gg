@@ -1,0 +1,5 @@
+<% if signed_in? %>
+  <%= link_to 'Add new variant', new_package_variant_path(package)  %>
+<% else %>
+  <%= link_to 'Register', new_user_path %> for add new variants
+<% end %>

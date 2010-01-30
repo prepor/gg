@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: packages
+#
+#  id            :integer         not null, primary key
+#  name          :string(255)
+#  original_name :string(255)
+#  version       :string(255)
+#  description   :text
+#  authors       :string(255)
+#  project_uri   :string(255)
+#  gem_uri       :string(255)
+#  created_at    :datetime
+#  updated_at    :datetime
+#
+
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+# one:
+#   column: value
+#
+# two:
+#   column: value
