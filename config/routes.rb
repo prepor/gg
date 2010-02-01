@@ -4,7 +4,7 @@ ActionController::Routing::Routes.draw do |map|
   Clearance::Routes.draw(map)
   
   map.resources :packages do |package|
-    package.resources :variants do |variant|
+    package.resources :variants, :member => [:approve, :decline] do |variant|
       variant.resources :control_hooks
     end
   end
