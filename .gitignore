@@ -5,6 +5,8 @@ specs.4.8
 Capfile
 config/deploy.rb
 
+db/development.sqlite3
+
 bin/*
 vendor/gems/*
 !vendor/gems/cache/

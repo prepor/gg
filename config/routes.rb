@@ -4,7 +4,7 @@ ActionController::Routing::Routes.draw do |map|
   Clearance::Routes.draw(map)
   
   map.resources :packages do |package|
-    package.resources :variants, :member => [:approve, :decline] do |variant|
+    package.resources :variants, :member => { :approve => :put, :decline => :put } do |variant|
       variant.resources :control_hooks
     end
   end
@@ -49,6 +49,8 @@ ActionController::Routing::Routes.draw do |map|
   # consider removing or commenting them out if you're using named routes and resources.
   # map.connect ':controller/:action/:id'
   # map.connect ':controller/:action/:id.:format'
+  
+  map.connect 'help', :controller => 'root', :action => 'help'
   
   map.root :controller => 'root'
 end

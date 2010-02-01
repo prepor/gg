@@ -14,5 +14,7 @@
 #
 
 class ControlHook < ActiveRecord::Base
+  validates_presence_of :name
+  
   belongs_to :last_edit_by, :class_name => User
 end

@@ -6,10 +6,14 @@ class VariantsController < InheritedResources::Base
   
   def approve
     resource.approve!
+    flash[:success] = 'Variant approved'
+    redirect_to package_variant_path(parent, resource)
   end
   
   def decline
     resource.decline!
+    flash[:success] = 'Variant declined'
+    redirect_to package_path(parent)
   end
 
   protected
@@ -25,7 +29,7 @@ class VariantsController < InheritedResources::Base
   end
   
   def only_maintainers
-    deny_access unless @variant.maintainers.include?(current_user)
+    deny_access unless parent.maintainers.include?(current_user)
   end
   
 end

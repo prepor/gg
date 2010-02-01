@@ -2,7 +2,16 @@
 
 <% if @user == current_user %>
   Variants for approve:<br/>
-  <% @user.variants_for_approve.each do |variant| %>
-    <%= link_to variant.package.name, package_variant_path(variant.package, variant) %>
+  <ul>
+  <% @user.variants_by_state(:suggested).each do |variant| %>
+    <li><%= link_to variant.package.name, package_variant_path(variant.package, variant) %></li>
   <% end %>
+  </ul>
+  
+  Suggested variants:<br/>
+  <ul>
+  <% @user.variants.suggested.each do |variant| %>
+    <li><%= link_to variant.package.name, package_variant_path(variant.package, variant) %></li>
+  <% end %>
+  </ul>
 <% end %>

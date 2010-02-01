@@ -15,7 +15,7 @@ ActiveRecord::Schema.define(:version => 20100124203731) do
     t.string   "name"
     t.string   "content"
     t.datetime "last_edit_at"
-    t.boolean  "is_default",      :default => true
+    t.boolean  "is_default",      :default => false
     t.integer  "last_edit_by_id"
     t.integer  "variant_id"
     t.datetime "created_at"
@@ -74,9 +74,10 @@ ActiveRecord::Schema.define(:version => 20100124203731) do
     t.string   "sha1"
     t.string   "md5"
     t.string   "size"
-    t.boolean  "is_generated", :default => false
-    t.string   "state",        :default => "approved"
+    t.boolean  "is_generated",  :default => false
+    t.string   "state",         :default => "approved"
     t.integer  "package_id"
+    t.integer  "created_by_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

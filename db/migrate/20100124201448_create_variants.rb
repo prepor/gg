@@ -14,6 +14,8 @@ class CreateVariants < ActiveRecord::Migration
       
       t.integer :package_id
       
+      t.integer :created_by_id
+      
       t.timestamps
     end
   end

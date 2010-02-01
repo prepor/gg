@@ -1,5 +1,7 @@
 <h2>Add new variant for package <%= @package.name %></h2>
 <% semantic_form_for [@package, resource] do |form| %>
+  <%= error_messages_for 'variant' %>
+  
   <% form.inputs do %>
     <%= form.input :platform, :as => :select, :collection => ['all'] + GoodGem.config[:platforms], :include_blank => false %>
     <%= form.input :arch, :as => :select, :collection => ['all'] + GoodGem.config[:archs], :include_blank => false %>

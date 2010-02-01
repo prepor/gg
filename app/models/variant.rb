@@ -23,6 +23,10 @@ class Variant < ActiveRecord::Base
   # before_create :add_default_depends
   
   named_scope :approved, :conditions => { :state => 'approved' }
+  named_scope :suggested, :conditions => { :state => 'suggested' }
+  named_scope :by_user_and_state, lambda { |user, state| 
+    { :conditions => { :state => state.to_s, :'users_packages.user_id' => user.id }, :joins => :users_packages }
+  }
   
   belongs_to :created_by, :class_name => 'User'
   belongs_to :package
@@ -34,14 +38,14 @@ class Variant < ActiveRecord::Base
   has_many :users_packages, :foreign_key => :package_id, :primary_key => :package_id
   has_many :maintainers, :class_name => 'User', :through => :users_packages, :source => :user
   
+  validates_presence_of :platform
+  validates_presence_of :arch
+  
+  validates_inclusion_of :platform, :in => ['all'] + GoodGem.config[:platforms]
+  validates_inclusion_of :arch, :in => ['all'] + GoodGem.config[:archs]
+  
   accepts_nested_attributes_for :depends
   accepts_nested_attributes_for :control_hooks
-  
-  def self.suggested_by_user(user)
-    self.with_exclusive_scope do
-      all :conditions => { :state => 'suggested', :'users_packages.user_id' => user.id }, :joins => :users_packages
-    end
-  end
   
   def control_file(for_index = false)
     file = ["Package: gem-#{package.name}",
@@ -128,8 +132,8 @@ class Variant < ActiveRecord::Base
     save
   end  
   
-  def after_create
-    # GoodGem.update_index(self)
+  def before_create
+    self.is_generated = false
   end
   
   def add_default_depends
@@ -174,6 +178,7 @@ class Variant < ActiveRecord::Base
   
   def approve!
     self.state = 'approved'
+    move_old_variant_to_archive
     send_notification_about_approve
     save
   end

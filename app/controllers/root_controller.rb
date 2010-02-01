@@ -4,4 +4,8 @@ class RootController < ApplicationController
     
   end
   
+  def help
+    
+  end
+  
 end

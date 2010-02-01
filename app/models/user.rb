@@ -19,9 +19,11 @@ class User < ActiveRecord::Base
     
   has_many :users_packages
   has_many :packages, :through => :users_packages
+  has_many :variants, :foreign_key => :created_by_id
   
-  def variants_for_approve
-    Variant.suggested_by_user(self)
+  def variants_by_state(state)    
+    Variant.by_user_and_state(self, state.to_s)
   end
+
   
 end

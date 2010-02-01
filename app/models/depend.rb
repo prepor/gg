@@ -14,6 +14,10 @@
 class Depend < ActiveRecord::Base
   CompareTypes = ['<<', '<=', '=', '>=', '>>']
   
+  validates_presence_of :name
+  
+  validates_inclusion_of :compare_type, :in => CompareTypes, :allow_blank => true
+  
   def for_list
     name + (version.present? ? " (#{compare_type} #{version})" : '')
   end

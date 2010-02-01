@@ -17,12 +17,17 @@
 require 'open-uri'
 
 class Package < ActiveRecord::Base
-  after_create :set_defaults
-  
   has_many :users_packages
   has_many :maintainers, :class_name => 'User', :through => :users_packages, :source => :user
   
   has_many :variants
+  
+  after_create :set_defaults
+  
+  validates_presence_of :name
+  validates_presence_of :original_name
+  validates_presence_of :version
+  
     
   def maintainers_list
     maintainers.map { |v| "#{v.name} <#{v.email}>"} * ', '
@@ -43,7 +48,7 @@ class Package < ActiveRecord::Base
   end
   
   def variant_for(platform, arch)
-    variants = variants.approved
+    variants = self.variants.approved
     [[platform, arch], [platform, 'all'], ['all', arch], ['all', 'all']].each do |p, a|
       if (variant = variants.detect { |v| v.platform == p && v.arch == a })
         return variant

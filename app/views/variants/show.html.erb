@@ -1,4 +1,7 @@
 <h2><%= @package.name %> <%= resource.state != 'approved' ? "(#{resource.state})" : '' %> | <%= link_to 'deb info', package_path(@package) %></h2>
+<% if resource.state != 'approved' && @package.maintainers.include?(current_user) %>
+  <%= link_to 'Approve', approve_package_variant_path(@package, resource), :method => :put %> | <%= link_to 'Decline', decline_package_variant_path(@package, resource), :method => :put %>
+<% end %>
 <div><%= render :partial => 'variants/suggest_add', :locals => { :package => @package} %></div>
 <div>platform <strong><%= resource.platform %></strong>, arch <strong><%= resource.arch %></strong></div>
 <strong>Depends:</strong> <%= resource.depends.map { |v| v.for_list } * ', ' %><br/>
