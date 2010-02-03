@@ -24,10 +24,8 @@ class Package < ActiveRecord::Base
   
   after_create :set_defaults
   
-  validates_presence_of :name
   validates_presence_of :original_name
   validates_presence_of :version
-  
     
   def maintainers_list
     maintainers.map { |v| "#{v.name} <#{v.email}>"} * ', '
@@ -65,19 +63,27 @@ class Package < ActiveRecord::Base
   end
   
   def receive_spec
-    desc = ActiveSupport::JSON.decode(open(GoodGem.config[:gems_api_url] + "#{original_name}.json").read)
-    last_version = Gem::Version.new(desc['version'])
-    if version != last_version
-      self.version = last_version
-      variants.each do |variant|
-        variant.is_generated = false
-      end
+    desc = nil
+    begin
+      desc = ActiveSupport::JSON.decode(open(GoodGem.config[:gems_api_url] + "#{original_name}.json").read)
+    rescue StandardError => e
+      puts "Error while receiving specs for #{name}"
     end
-    self.description = desc['info']
-    self.authors = desc['info']
-    self.project_uri = desc['project_uri']
-    self.gem_uri = desc['gem_uri']
-    save
+    if desc
+      last_version = Gem::Version.new(desc['version'])
+      if version != last_version
+        self.version = last_version
+        variants.each do |variant|
+          variant.is_generated = false
+        end
+      end
+      self.is_spec_received = true
+      self.description = desc['info']
+      self.authors = desc['info']
+      self.project_uri = desc['project_uri']
+      self.gem_uri = desc['gem_uri']
+      save
+    end
   end
   
   def set_created_at
@@ -85,10 +91,10 @@ class Package < ActiveRecord::Base
   end
   
   def set_defaults
+    set_name
     add_main_maintainer
     add_first_variant
-    set_created_at
-    set_name
+    set_created_at    
     save
   end
   

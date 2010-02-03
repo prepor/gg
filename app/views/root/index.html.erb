@@ -32,7 +32,22 @@
 
 <div class="grid_6">
   <div id="counter">
-    <div class="number">9,801 debs now</div>
-  </div>	
-  			  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.		  
+    <div class="number"><%= number_with_delimiter Package.count %> debs now</div>
+  </div>
+  
+  <p>GoodGem is simple apt-ready wrapper around gems. It has all Gemcutter's gems, updated daily and absolutely free.</p>
+  
+  <h4>For what</h4>
+  	<p>Talk with admins and users in one language. If Ruby-written app to end users, not targeted at developers, it will be much accustomed to see the apt-get install gem-god.</p>
+  	<p>Many gems are has native extensions, who in turn tend to have their dependencies, not connected with the gem. So, with GoodGem can be added according to the apt (mysql-dev), and in addition describe the keys to build specific to a particular platform (everything here as in the usual apt-repo, you can make different versions for platforms and architectures) . And in general, any recipes, such as the establishment of the same init-script.</p>
+  	
+  <h4>Maintainers</h4>
+    <p>This site is only for maintainers. You can suggest your own variant of scripts. Once approved by any package maintainers, you yourself become a maintainer. Easy.</p>
+    
+  <h4>Roadmap</h4>
+  <ul>
+    <li>Accumulate gems dependencies to deb dependencies. If gem em-mysql is dependent on mysqlplus, and mysqlplus deb is dependent on mysql, em-mysql deb should dependent on mysql.</li>
+    <li>Gemcutter's webhooks support for realtime updates</li>
+    <li>Maintainers ability to add 2-3 major versions of gem (rails2, rails3).</li>
+  </ul>
 </div>

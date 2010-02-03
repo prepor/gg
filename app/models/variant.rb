@@ -165,20 +165,32 @@ class Variant < ActiveRecord::Base
   end
   
   def send_notifications_about_suggest
-    
+    package.maintainers.each do |user|
+      Pony.mail(:to => user.email, 
+                :from => 'robo@gg.prepor.ru', 
+                :subject => "New variant of #{package.name} suggested",
+                :body => "http://#{HOST}/packages/#{package.id}/variants/#{self.id}")
+      end
   end
   
   def send_notification_about_approve
-    
+    Pony.mail(:to => created_by.email, 
+              :from => 'robo@gg.prepor.ru', 
+              :subject => "Your variant of #{package.name} approved",
+              :body => "http://#{HOST}/packages/#{package.id}/variants/#{self.id}")
   end
   
   def send_notification_about_decline
-    
+    Pony.mail(:to => created_by.email, 
+              :from => 'robo@gg.prepor.ru', 
+              :subject => "Your variant of #{package.name} declined",
+              :body => "http://#{HOST}/packages/#{package.id}/variants/#{self.id}")
   end
   
   def approve!
     self.state = 'approved'
     move_old_variant_to_archive
+    self.package.maintainers << self.created_by
     send_notification_about_approve
     save
   end
@@ -194,7 +206,12 @@ class Variant < ActiveRecord::Base
       self.state = 'approved'
       move_old_variant_to_archive
     else
-      self.state = 'suggested'
+      self.state = 'suggested'      
+    end
+  end
+  
+  def after_create
+    if state != 'approved'
       send_notifications_about_suggest
     end
   end

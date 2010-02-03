@@ -15,10 +15,13 @@ module GoodGem
     
     def update_variants(versions)
       versions.each do |k, (name, version, lang)|
-        unless (package = Package.find_or_initialize_by_original_name(name)) && package.version != version.to_s          
-          package.version = version.to_s
-          puts "Receive specs for #{package.name}"
-          package.receive_spec
+        package = Package.find_or_initialize_by_original_name(name)
+        if package.version != version
+          package.version = version
+          if !package.new_record? || package.save
+            puts "Receive specs for #{package.name}"
+            package.receive_spec
+          end
         end
       end
     end
@@ -29,7 +32,7 @@ module GoodGem
         dist_path = Variant.dist_path(platform, arch)
         dist_path.mkpath
         (dist_path + 'Packages_new').open('w') do |f|     
-          Package.all.each do |package|
+          Package.find(:all, :conditions => { :is_spec_received => true }).each do |package|
             variant = package.variant_for(platform, arch)
             unless variant.is_generated?
               puts "Generating #{variant.deb_name}"
@@ -55,11 +58,11 @@ module GoodGem
     def receive_specs
       gz_path = File.join(RAILS_ROOT, 'specs.4.8.gz')
       plain_path = File.join(RAILS_ROOT, 'specs.4.8')
-      # `wget #{GoodGem.config[:specs_url]} -O #{gz_path}`
-      # 
-      # `gzip -dfv -c #{gz_path} > #{plain_path}`
+      `wget #{GoodGem.config[:specs_url]} -O #{gz_path}`
+      
+      `gzip -dfv -c #{gz_path} > #{plain_path}`
 
-      Marshal.load(File.open(plain_path, 'r') { |f| f.read })[0..100]
+      Marshal.load(File.open(plain_path, 'r') { |f| f.read })
     end
     
     def last_versions(data)

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100124203731) do
+ActiveRecord::Schema.define(:version => 20100202223901) do
 
   create_table "control_hooks", :force => true do |t|
     t.string   "name"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20100124203731) do
     t.string   "gem_uri"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "is_spec_received", :default => false
   end
 
   create_table "users", :force => true do |t|
