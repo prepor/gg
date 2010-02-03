@@ -1,0 +1,83 @@
+= Pony, the express way to send email in Ruby
+
+== Overview
+
+Ruby no longer has to be jealous of PHP's mail() function, which can send an email in a single command.
+
+  Pony.mail(:to => 'you@example.com', :from => 'me@example.com', :subject => 'hi', :body => 'Hello there.')
+  Pony.mail(:to => 'you@example.com', :from => 'me@example.com', :subject => 'hi', :body => '<h1>Hello there!</h1>', :content_type => 'text/html')
+  Pony.mail(:to => 'you@example.com', :cc => 'him@example.com', :from => 'me@example.com', :subject => 'hi', :body => 'Howdy')
+
+Any option key may be omitted except for :to.
+
+
+== Transport
+
+Pony uses /usr/sbin/sendmail to send mail if it is available, otherwise it uses SMTP to localhost.
+
+This can be over-ridden if you specify a via option
+
+  Pony.mail(:to => 'you@example.com', :via => :smtp) # sends via SMTP
+  
+  Pony.mail(:to => 'you@example.com', :via => :sendmail) # sends via sendmail
+
+You can also specify options for SMTP:
+
+  Pony.mail(:to => 'you@example.com', :via => :smtp, :smtp => {
+    :host   => 'smtp.yourserver.com',
+    :port   => '25',
+    :user   => 'user',
+    :password   => 'password',
+    :auth   => :plain # :plain, :login, :cram_md5, no auth by default
+    :domain => "localhost.localdomain" # the HELO domain provided by the client to the server
+  }
+
+== TLS/SSL
+
+With smtp transport it also possible to use TLS/SSL:
+
+  Pony.mail(:to => 'you@example.com', :via => :smtp, :smtp => {
+    :host   => 'smtp.gmail.com',
+    :port   => '587',
+    :tls    => true,
+    :user   => 'user',
+    :password   => 'password',
+    :auth   => :plain # :plain, :login, :cram_md5, no auth by default
+    :domain => "localhost.localdomain" # the HELO domain provided by the client to the server
+  })
+
+== Attachments
+
+You can attach a file or two with the :attachments option:
+
+  Pony.mail(..., :attachments => {"foo.zip" => File.read("path/to/foo.zip"), "hello.txt" => "hello!"})
+
+An attachment's mime-type is set based on the filename (as dictated by the ruby gem mime-types).  So 'foo.pdf' has a mime-type of 'application/pdf'
+
+== Meta
+
+Maintained by Ben Prew
+
+Written by Adam Wiggins
+
+Patches contributed by: Mathieu Martin, Arun Thampi, Thomas Hurst, Stephen
+Celis, Othmane Benkirane, Neil Mock, Hiroshi Saito, and Nickolas Means
+
+Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
+
+http://github.com/benprew/pony
+
+== Releases
+
+0.5
+* default location of sendmail to /usr/sbin/sendmail if sendmail not in path
+* fix bug: README not showing password option (listed as pass)
+
+0.4.1
+* Add :cc capability
+* fix bug: resolve body not displaying when attachments sent
+
+0.4
+* Implemented file attachments option
+* use TLS if :tls => true
+
