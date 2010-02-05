@@ -33,12 +33,13 @@ module GoodGem
         dist_path.mkpath
         (dist_path + 'Packages_new').open('w') do |f|     
           Package.find(:all, :conditions => { :is_spec_received => true }).each do |package|
-            variant = package.variant_for(platform, arch)
-            unless variant.is_generated?
-              puts "Generating #{variant.deb_name}"
-              variant.generate
-            end                      
-            f.puts "#{variant.control_file(true)}\n\n"
+            package.variants_for(platform).each do |variant|
+              unless variant.is_generated?
+                puts "Generating #{variant.deb_name}"
+                variant.generate
+              end                      
+              f.puts "#{variant.control_file(true)}\n\n"
+            end
           end
         end
         FileUtils.mv((dist_path + 'Packages_new').to_s, (dist_path + 'Packages').to_s, :force => true)

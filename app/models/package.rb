@@ -45,13 +45,9 @@ class Package < ActiveRecord::Base
     variant.add_default_hooks
   end
   
-  def variant_for(platform, arch)
+  def variants_for(platform)
     variants = self.variants.approved
-    [[platform, arch], [platform, 'all'], ['all', arch], ['all', 'all']].each do |p, a|
-      if (variant = variants.detect { |v| v.platform == p && v.arch == a })
-        return variant
-      end
-    end
+    variants.select { |v| v.platform == platform || v.platform == 'all' }
   end
   
   def version

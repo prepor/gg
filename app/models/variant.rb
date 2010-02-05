@@ -92,10 +92,9 @@ class Variant < ActiveRecord::Base
     self.size = File.size("#{path.to_s}.deb")
   end
   
-  def self.dist_path(platform, arch)
+  def self.dist_path(platform)
     path = GoodGem.config[:dists_path]
     path += platform unless platform == 'all'
-    path += arch unless arch == 'all'
     path
   end
   
