@@ -7,6 +7,10 @@ module GoodGem
     
     require 'config/system'
     
+    def packages
+      @@packages ||= Package.all( :include => {:variants => :depends }, :conditions => { :variants => {:state => 'approved' }}).index_by { |v| v.original_name }
+    end
+    
     def update_specs
       data = receive_specs
       update_variants last_versions(data)
@@ -15,7 +19,7 @@ module GoodGem
     
     def update_variants(versions)
       versions.each do |k, (name, version, lang)|
-        package = Package.find_or_initialize_by_original_name(name)
+        package = packages[name] ||= Package.new(:original_name => name)
         if package.version != version
           package.version = version
           if !package.new_record? || package.save
@@ -27,34 +31,27 @@ module GoodGem
     end
     
     def update_package_files
-      all_variants.each do |platform, arch|
-        puts "Generating packages for platform #{platform} and arch #{arch}"
-        dist_path = Variant.dist_path(platform, arch)
+      (config[:platforms] + ['all']).each do |platform|
+        puts "Generating packages for platform #{platform}"
+        dist_path = Variant.dist_path(platform)
         dist_path.mkpath
         (dist_path + 'Packages_new').open('w') do |f|     
-          Package.find(:all, :conditions => { :is_spec_received => true }).each do |package|
-            package.variants_for(platform).each do |variant|
-              unless variant.is_generated?
-                puts "Generating #{variant.deb_name}"
-                variant.generate
-              end                      
-              f.puts "#{variant.control_file(true)}\n\n"
+          packages.each do |original_name, package|
+            if package.is_spec_received
+              package.variants_for(platform).each do |variant|
+                unless variant.is_generated?
+                  puts "Generating #{variant.deb_name}"
+                  variant.generate
+                end                      
+                f.puts "#{variant.control_file(true)}\n\n"
+              end
             end
           end
         end
         FileUtils.mv((dist_path + 'Packages_new').to_s, (dist_path + 'Packages').to_s, :force => true)
       end
     end
-    
-    def all_variants
-      variants = [['all', 'all']]
-      config[:platforms].each do |platform|
-        (['all'] + config[:archs]).each do |arch|
-          variants << [platform, arch]
-        end
-      end
-      variants
-    end
+
     
     def receive_specs
       gz_path = File.join(RAILS_ROOT, 'specs.4.8.gz')

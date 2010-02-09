@@ -55,7 +55,7 @@ class Variant < ActiveRecord::Base
     "Maintainer: #{package.maintainers_list}",
     "Priority: extra",
     "Section: gems",
-    "Filename: #{pool_deb_path}"]
+    "Filename: /#{pool_deb_path}"]
     if for_index
       file << "Size: #{size}"
       file << "SHA1: #{sha1}"
